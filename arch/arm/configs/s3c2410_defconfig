@@ -1464,8 +1464,9 @@ CONFIG_FB_CFB_IMAGEBLIT=y
 # Frame buffer hardware drivers
 #
 # CONFIG_FB_S1D13XXX is not set
-CONFIG_FB_S3C2410=y
-# CONFIG_FB_S3C2410_DEBUG is not set
+# CONFIG_FB_S3C2410 is not set
+CONFIG_FB_S3C2440=y
+# CONFIG_FB_S3C2440_DEBUG is not set
 # CONFIG_FB_SMSCUFX is not set
 # CONFIG_FB_UDL is not set
 # CONFIG_FB_VIRTUAL is not set
