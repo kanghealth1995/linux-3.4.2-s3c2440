@@ -2550,6 +2550,8 @@ static int check_modinfo(struct module *mod, struct load_info *info)
 		err = try_to_force_load(mod, "bad vermagic");
 		if (err)
 			return err;
+
+/* add by zhengkang */
 #if 1
 	}
 #else
