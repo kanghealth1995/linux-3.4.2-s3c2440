@@ -49,6 +49,7 @@
 #include <plat/devs.h>
 #include <plat/cpu.h>
 #include <plat/mci.h>
+#include <plat/udc.h>
 #include <plat/common-smdk.h>
 
 #include "common.h"
@@ -202,6 +203,11 @@ static struct platform_device s3c_device_buttons = {
 	}
 };
 
+/* USB device UDC support */
+static struct s3c2410_udc_mach_info mini2440_udc_cfg __initdata = {
+	.pullup_pin = S3C2410_GPC(5),
+};
+
 static struct platform_device *smdk2440_devices[] __initdata = {
 	&s3c_device_ohci,
 	&s3c_device_lcd,
@@ -211,6 +217,7 @@ static struct platform_device *smdk2440_devices[] __initdata = {
 	&s3c_device_rtc,
 	&s3c_device_sdi,
 	&s3c_device_buttons,
+	&s3c_device_usbgadget,
 };
 
 static void __init smdk2440_map_io(void)
@@ -228,10 +235,16 @@ static void __init smdk2440_machine_init(void)
 		s3c_gpio_setpull(smdk2440_buttons[i].gpio, S3C_GPIO_PULL_UP);
 		s3c_gpio_cfgpin(smdk2440_buttons[i].gpio, S3C2410_GPIO_INPUT);
 	}
-	s3c24xx_fb_set_platdata(&smdk2440_fb_info);
-	s3c_i2c0_set_platdata(NULL);
-	s3c24xx_mci_set_platdata(&mini2440_mmc_cfg);
 
+	s3c_i2c0_set_platdata(NULL);
+
+	/* LCD */
+	s3c24xx_fb_set_platdata(&smdk2440_fb_info);
+
+	/* MMC/SDHC */
+	s3c24xx_mci_set_platdata(&mini2440_mmc_cfg);
+	/* USB UDC Driver */
+	s3c24xx_udc_set_platdata(&mini2440_udc_cfg);
 
 	platform_add_devices(smdk2440_devices, ARRAY_SIZE(smdk2440_devices));
 	smdk_machine_init();
