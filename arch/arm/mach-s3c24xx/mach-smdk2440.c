@@ -23,6 +23,9 @@
 #include <linux/platform_device.h>
 #include <linux/io.h>
 #include <linux/mmc/host.h>
+#include <linux/gpio.h>
+#include <linux/input.h>
+#include <linux/gpio_keys.h>
 
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
@@ -159,6 +162,46 @@ static struct s3c24xx_mci_pdata mini2440_mmc_cfg __initdata = {
    .ocr_avail     = MMC_VDD_32_33|MMC_VDD_33_34,
 };
 
+static struct gpio_keys_button smdk2440_buttons[] = {
+	{
+		.gpio		= S3C2410_GPF(0),
+		.code		= KEY_F1,
+		.desc		= "S2",
+		.active_low	= 1,
+	},
+	{
+		.gpio		= S3C2410_GPF(2),
+		.code		= KEY_F2,
+		.desc		= "S3",
+		.active_low	= 1,
+	},
+	{
+		.gpio		= S3C2410_GPG(3),
+		.code		= KEY_F3,
+		.desc		= "S4",
+		.active_low	= 1,
+	},
+	{
+		.gpio		= S3C2410_GPG(11),
+		.code		= KEY_F4,
+		.desc		= "S5",
+		.active_low	= 1,
+	},
+};
+
+static struct gpio_keys_platform_data smdk2440_button_data = {
+	.buttons	= smdk2440_buttons,
+	.nbuttons	= ARRAY_SIZE(smdk2440_buttons),
+};
+
+static struct platform_device s3c_device_buttons = {
+	.name		= "gpio-keys",
+	.id		= -1,
+	.dev		= {
+		.platform_data	= &smdk2440_button_data,
+	}
+};
+
 static struct platform_device *smdk2440_devices[] __initdata = {
 	&s3c_device_ohci,
 	&s3c_device_lcd,
@@ -167,6 +210,7 @@ static struct platform_device *smdk2440_devices[] __initdata = {
 	&s3c_device_iis,
 	&s3c_device_rtc,
 	&s3c_device_sdi,
+	&s3c_device_buttons,
 };
 
 static void __init smdk2440_map_io(void)
@@ -178,6 +222,12 @@ static void __init smdk2440_map_io(void)
 
 static void __init smdk2440_machine_init(void)
 {
+	int i = 0;
+
+	for (i = 0; i < ARRAY_SIZE(smdk2440_buttons); i++) {
+		s3c_gpio_setpull(smdk2440_buttons[i].gpio, S3C_GPIO_PULL_UP);
+		s3c_gpio_cfgpin(smdk2440_buttons[i].gpio, S3C2410_GPIO_INPUT);
+	}
 	s3c24xx_fb_set_platdata(&smdk2440_fb_info);
 	s3c_i2c0_set_platdata(NULL);
 	s3c24xx_mci_set_platdata(&mini2440_mmc_cfg);
